@@ -18,8 +18,8 @@ from imquality.utils import pil2ndarray
 with open(os.path.join(MODELS_PATH, "normalize.pickle"), "rb") as file:
     scale_parameters = pickle.load(file)
 
-model = svmutil.svm_load_model(os.path.join(MODELS_PATH, "brisque_svm.txt"))
-
+with open(os.path.join(MODELS_PATH, 'model.pkl'), 'rb') as f:
+    model = pickle.load(f)
 
 class MscnType(Enum):
     mscn = 1
@@ -151,12 +151,9 @@ def calculate_features(image: PIL.Image, kernel_size, sigma) -> numpy.ndarray:
 
 
 def predict(features: numpy.ndarray) -> float:
-    x, idx = svmutil.gen_svm_nodearray(
-        features, isKernel=(model.param.kernel_type == svmutil.PRECOMPUTED)
-    )
-    nr_classifier = 1
-    prob_estimates = (svmutil.c_double * nr_classifier)()
-    return svmutil.libsvm.svm_predict_probability(model, x, prob_estimates)
+    predict = model.predict(features)
+
+    return predict[0]
 
 
 def score(image: PIL.Image.Image, kernel_size=7, sigma=7 / 6) -> float:
