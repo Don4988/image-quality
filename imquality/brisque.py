@@ -10,6 +10,7 @@ import scipy.signal
 import skimage.color
 import skimage.transform
 from libsvm import svmutil
+import numpy as np
 
 from imquality.models import MODELS_PATH
 from imquality.statistics import AsymmetricGeneralizedGaussian, gaussian_kernel2d
@@ -151,6 +152,7 @@ def calculate_features(image: PIL.Image, kernel_size, sigma) -> numpy.ndarray:
 
 
 def predict(features: numpy.ndarray) -> float:
+    features = features.reshape((1, -1))
     predict = model.predict(features)
 
     return predict[0]
